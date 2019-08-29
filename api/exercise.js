@@ -2,27 +2,42 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 
-router.post('/new-user',(req,res,next)=>{
-    const newUser = new User({username:req.body.username});
-    newUser.save((err,data)=>{
-        if(err){
+router.post('/new-user', (req, res, next) => {
+    //check for existing users
+    User.findOne({ username: req.body.username }, (err, data) => {
+        if (err) {
             next(err);
         }
-        else{
-            res.json({username:data.username,_id:data._id});
+        //if the user already exists
+        else if (data) {
+            //return the existing user
+            res.json({ username: data.username, _id: data._id });
+        }
+        else {
+            //create the new user
+            newUser.save((err, newUser) => {
+                if (err) {
+                    next(err);
+                }
+                else {
+                    res.json({ username: newUser.username, _id: newUser._id });
+                }
+            });
         }
     });
-});
-
-router.get('/users',(req,res)=>{
+    const newUser = new User({ username: req.body.username });
 
 });
 
-router.post('/add',(req,res)=>{
+router.get('/users', (req, res) => {
 
 });
 
-router.get('/log',(req,res)=>{
+router.post('/add', (req, res) => {
+
+});
+
+router.get('/log', (req, res) => {
 
 });
 
