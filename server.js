@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
+const exercise = require('./api/exercise');
 
 const cors = require('cors')
 
@@ -18,11 +19,15 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
+//exercise
+app.use('/api/exercise',exercise);
 
 // Not found middleware
 app.use((req, res, next) => {
   return next({status: 404, message: 'not found'})
-})
+});
+
+
 
 // Error Handling middleware
 app.use((err, req, res, next) => {
