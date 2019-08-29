@@ -29,8 +29,21 @@ router.post('/new-user', (req, res, next) => {
 
 });
 
-router.get('/users', (req, res) => {
-
+router.get('/users', (req, res, next) => {
+    User.find({}, (err, users) => {
+        if (err) {
+            next(err);
+        }
+        else if (users) {
+            const userArr = users.map(user => {
+                return { username: user.username, _id: user._id }
+            });
+            res.json(userArr);
+        }
+        else{
+            res.json([]);
+        }
+    });
 });
 
 router.post('/add', (req, res) => {
