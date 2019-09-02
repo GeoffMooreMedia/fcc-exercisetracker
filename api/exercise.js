@@ -85,8 +85,26 @@ router.post('/add', (req, res, next) => {
 router.get('/log', (req, res, next) => {
     //make sure the userId is provided
     if (!req.query.userId) return next('userID required');
+    //object of the query parameters
+    let queryObj = { user: req.query.userId };
+    //if there is a from date
+    if (req.query.from) {
+        queryObj.date = { $gte: new Date(req.query.from) };
+    }
+    //if there is a to date
+    if (req.query.to) {
+        //if date already defined
+        if (queryObj.date) {
+            queryObj.date.$lte = new Date(req.query.to);
+        }
+        else {
+            queryObj.date = { $lte: new Date(req.query.to) };
+        }
+    }
+
+
     //find all exercises for this user
-    Exercise.find({ user: req.query.userId }, (err, exercises) => {
+    Exercise.find(queryObj, (err, exercises) => {
         //check for errors
         if (err) return next(err);
         //find the user
@@ -96,7 +114,7 @@ router.get('/log', (req, res, next) => {
             //return the data
             res.json({ username: user.username, logs: exercises, count: exercises.length });
         });
-    });
+    }).limit(req.query.limit && parseInt(req.query.limit));
 });
 
 module.exports = router;
